@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>ガンダムクイズ</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#eef2f7;color:#111827}
+.app{max-width:560px;margin:auto;min-height:100vh;background:#fff;box-shadow:0 0 24px #0001}
+header{background:#111827;color:white;padding:24px 20px;text-align:center}
+header h1{margin:0;font-size:28px;letter-spacing:.05em} header p{margin:7px 0 0;color:#cbd5e1}
+main{padding:22px 18px 32px}.hidden{display:none}
+button{width:100%;border:0;border-radius:14px;padding:15px 16px;font-size:17px;font-weight:700;cursor:pointer}
+.start{background:#2563eb;color:#fff;margin-top:12px}.secondary{background:#e5e7eb;color:#111827;margin-top:10px}
+.card{border:1px solid #dbe1e8;border-radius:18px;padding:18px;box-shadow:0 4px 14px #0000000b}
+.progress{font-size:14px;color:#64748b;margin-bottom:12px}.question{font-size:20px;font-weight:700;line-height:1.6;margin-bottom:18px}
+.choice{background:#f8fafc;border:2px solid #e2e8f0;text-align:left;margin:9px 0;font-weight:600}
+.choice:active{transform:scale(.99)} .choice.correct{background:#dcfce7;border-color:#16a34a}.choice.wrong{background:#fee2e2;border-color:#dc2626}
+.feedback{margin-top:15px;padding:14px;border-radius:12px;background:#f1f5f9;line-height:1.6;font-weight:600}
+.result{text-align:center;padding:18px}.score{font-size:48px;font-weight:800;color:#2563eb;margin:12px 0}
+.small{font-size:13px;color:#64748b;line-height:1.6}.badge{display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>ガンダムクイズ</h1><p>宇宙世紀・モビルスーツ編</p></header>
+<main>
+<section id="home">
+<div class="card">
+<span class="badge">10問チャレンジ</span>
+<h2>ガンダムの知識を試そう！</h2>
+<p class="small">4択問題を10問出題します。まずは初級〜中級レベルの問題からスタートします。</p>
+<button class="start" id="startBtn">クイズ開始</button>
+</div>
+</section>
+
+<section id="quiz" class="hidden">
+<div class="progress" id="progress"></div>
+<div class="card">
+<div class="question" id="question"></div>
+<div id="choices"></div>
+<div id="feedback" class="feedback hidden"></div>
+<button class="start hidden" id="nextBtn">次の問題</button>
+</div>
+</section>
+
+<section id="result" class="hidden">
+<div class="card result">
+<span class="badge">クイズ終了</span>
+<h2>お疲れさまでした！</h2>
+<div class="score" id="score"></div>
+<p id="resultText"></p>
+<button class="start" id="againBtn">もう一度挑戦</button>
+<button class="secondary" id="homeBtn">タイトルに戻る</button>
+</div>
+</section>
+</main>
+</div>
+<script>
+const questions=[
+ {q:"『機動戦士ガンダム』で、アムロ・レイが搭乗するモビルスーツは？",a:["ガンダム","ザクⅡ","グフ","ドム"],c:0,e:"アムロ・レイは地球連邦軍の試作モビルスーツ、RX-78-2 ガンダムに搭乗します。"},
+ {q:"シャア・アズナブルが一年戦争時に搭乗した赤いザクの型式は？",a:["MS-06S","MS-07B","MS-09R","MS-14S"],c:0,e:"シャア専用ザクⅡはMS-06Sです。通常型のMS-06Fを上回る性能を持つ指揮官用機です。"},
+ {q:"『機動戦士ガンダム』の舞台となる戦争は？",a:["一年戦争","グリプス戦役","第一次ネオ・ジオン抗争","第二次ネオ・ジオン抗争"],c:0,e:"初代『機動戦士ガンダム』の中心となる戦争は一年戦争です。"},
+ {q:"ガンダムの型式番号 RX-78-2 の『RX』は、どの組織の開発計画に関連する記号？",a:["地球連邦軍","ジオン公国軍","アナハイム・エレクトロニクス","ティターンズ"],c:0,e:"RX-78-2は地球連邦軍のV作戦で開発された試作モビルスーツです。"},
+ {q:"『機動戦士Ζガンダム』で、カミーユ・ビダンが主に搭乗する可変モビルスーツは？",a:["Ζガンダム","百式","キュベレイ","ジ・O"],c:0,e:"カミーユの代表的な搭乗機はMSZ-006 Ζガンダムです。"},
+ {q:"『機動戦士ガンダムΖΖ』の主人公、ジュドー・アーシタが搭乗する主役機は？",a:["ΖΖガンダム","νガンダム","リ・ガズィ","サザビー"],c:0,e:"ジュドー・アーシタの主役機はMSZ-010 ΖΖガンダムです。"},
+ {q:"アムロ・レイが『逆襲のシャア』で搭乗するニュータイプ専用MSは？",a:["νガンダム","サザビー","ヤクト・ドーガ","ギラ・ドーガ"],c:0,e:"アムロが搭乗するRX-93 νガンダムは、フィン・ファンネルを装備した機体です。"},
+ {q:"『逆襲のシャア』でシャア・アズナブルが搭乗する赤い大型MSは？",a:["サザビー","ジオング","シナンジュ","ナイチンゲール"],c:0,e:"シャアの専用機はMSN-04 サザビーです。"},
+ {q:"ジオン公国軍の代表的な量産型モビルスーツといえば？",a:["ザクⅡ","ジム","ネモ","ジェガン"],c:0,e:"MS-06 ザクⅡは一年戦争を代表するジオン公国軍の量産型MSです。"},
+ {q:"地球連邦軍の量産型モビルスーツで、ガンダムの後継量産機として登場する機体は？",a:["ジム","ザクⅡ","グフ","ゲルググ"],c:0,e:"RGM-79 ジムは、ガンダムの開発技術を基に量産された地球連邦軍のMSです。"}
+];
+let order=[],current=0,score=0,answered=false;
+const $=id=>document.getElementById(id);
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function start(){
+ order=shuffle([...Array(questions.length).keys()]); current=0; score=0;
+ $("home").classList.add("hidden");$("result").classList.add("hidden");$("quiz").classList.remove("hidden");showQuestion();
+}
+function showQuestion(){
+ answered=false; const x=questions[order[current]];
+ $("progress").textContent=`第${current+1}問 / ${questions.length}問`;
+ $("question").textContent=x.q; $("feedback").classList.add("hidden");$("nextBtn").classList.add("hidden");
+ const choices=$("choices"); choices.innerHTML="";
+ shuffle(x.a.map((label,i)=>({label,i}))).forEach(o=>{
+   const b=document.createElement("button");b.className="choice";b.textContent=o.label;
+   b.onclick=()=>answer(b,o.i);choices.appendChild(b);
+ });
+}
+function answer(btn,i){
+ if(answered)return; answered=true; const x=questions[order[current]];
+ [...$("choices").children].forEach(b=>b.disabled=true);
+ if(i===x.c){score++;btn.classList.add("correct");$("feedback").textContent="正解！ "+x.e;}
+ else{btn.classList.add("wrong");$("feedback").textContent="不正解。 "+x.e;
+   [...$("choices").children].forEach(b=>{if(b.textContent===x.a[x.c])b.classList.add("correct")});
+ }
+ $("feedback").classList.remove("hidden");$("nextBtn").classList.remove("hidden");
+}
+function next(){
+ current++;
+ if(current<questions.length)showQuestion();else finish();
+}
+function finish(){
+ $("quiz").classList.add("hidden");$("result").classList.remove("hidden");
+ $("score").textContent=`${score} / ${questions.length}`;
+ $("resultText").textContent=score===10?"全問正解！ガンダム博士級です。":score>=7?"かなり詳しいですね！":"もう一度挑戦して、さらに知識を増やしましょう！";
+}
+$("startBtn").onclick=start;$("againBtn").onclick=start;$("nextBtn").onclick=next;
+$("homeBtn").onclick=()=>{$("result").classList.add("hidden");$("home").classList.remove("hidden")};
+</script>
+</body>
+</html>

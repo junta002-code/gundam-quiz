@@ -1,0 +1,9 @@
+{
+  "name":"ガンダムクイズ",
+  "short_name":"ガンダムクイズ",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#eef2f7",
+  "theme_color":"#111827",
+  "lang":"ja"
+}
