@@ -69,6 +69,16 @@
     .retry { background: #2563eb; }
     .back { background: #475569; }
   </style>
+
+<meta name="theme-color" content="#111827">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ガンダムクイズ">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-192.png">
+
 </head>
 <body>
   <div class="container">
@@ -10509,5 +10519,17 @@ function showResult() {
       alert('中級・上級は準備中です。');
     }
   </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js')
+      .catch(function (error) {
+        console.log('Service Worker registration failed:', error);
+      });
+  });
+}
+</script>
+
 </body>
 </html>
