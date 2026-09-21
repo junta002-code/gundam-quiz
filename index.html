@@ -24,28 +24,24 @@
         "Segoe UI",
         "Noto Sans JP",
         sans-serif;
-
-      background:
-        linear-gradient(
-          180deg,
-          #111827 0%,
-          #1e293b 100%
-        );
-
+      background: linear-gradient(
+        180deg,
+        #111827 0%,
+        #1e293b 100%
+      );
       color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding: 20px;
     }
 
     .container {
       width: 100%;
       max-width: 480px;
-      text-align: center;
+      margin: 0 auto;
+      padding-top: 50px;
     }
 
     .title {
+      text-align: center;
       font-size: 36px;
       font-weight: 800;
       margin-bottom: 10px;
@@ -53,10 +49,13 @@
     }
 
     .subtitle {
+      text-align: center;
       font-size: 16px;
       color: #cbd5e1;
       margin-bottom: 35px;
     }
+
+    /* 難易度選択 */
 
     .difficulty-buttons {
       display: flex;
@@ -73,18 +72,7 @@
       font-weight: bold;
       color: white;
       cursor: pointer;
-
-      box-shadow:
-        0 6px 15px rgba(0, 0, 0, 0.3);
-
-      transition:
-        transform 0.1s,
-        opacity 0.1s;
-    }
-
-    .difficulty-button:active {
-      transform: scale(0.97);
-      opacity: 0.85;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
 
     .beginner {
@@ -108,40 +96,151 @@
     }
 
     .footer {
+      text-align: center;
       margin-top: 35px;
       font-size: 13px;
       color: #94a3b8;
     }
 
     /* クイズ画面 */
-    #quiz-screen {
+
+    #quiz-screen,
+    #result-screen {
       display: none;
     }
 
-    .quiz-title {
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .quiz-level {
       font-size: 28px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 8px;
+    }
+
+    .question-number {
+      color: #cbd5e1;
+      font-size: 15px;
     }
 
     .question-box {
       background: white;
       color: #111827;
       border-radius: 16px;
-      padding: 25px;
+      padding: 25px 20px;
       margin-bottom: 20px;
       font-size: 20px;
       font-weight: bold;
+      line-height: 1.6;
+      text-align: center;
     }
 
-    .back-button {
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .answer-button {
+      width: 100%;
       border: none;
-      background: #475569;
+      border-radius: 12px;
+      padding: 17px 15px;
+      font-size: 17px;
+      font-weight: bold;
+      background: #334155;
       color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 16px;
       cursor: pointer;
+      text-align: left;
+    }
+
+    .answer-button:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    .correct {
+      background: #16a34a !important;
+    }
+
+    .incorrect {
+      background: #dc2626 !important;
+    }
+
+    .explanation {
+      display: none;
+      background: #f8fafc;
+      color: #1e293b;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 18px;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .next-button {
+      display: none;
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 17px;
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* 結果画面 */
+
+    .result-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 25px;
+    }
+
+    .score-box {
+      background: white;
+      color: #111827;
+      border-radius: 16px;
+      padding: 30px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .score {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .score-message {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .result-button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 17px;
+      margin-top: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+    }
+
+    .retry {
+      background: #2563eb;
+    }
+
+    .back {
+      background: #475569;
     }
   </style>
 </head>
@@ -150,7 +249,10 @@
 
   <div class="container">
 
+    <!-- ==================== -->
     <!-- 難易度選択画面 -->
+    <!-- ==================== -->
+
     <div id="start-screen">
 
       <div class="title">
@@ -175,7 +277,7 @@
 
         <button
           class="difficulty-button intermediate"
-          onclick="startQuiz('中級')"
+          onclick="notReady()"
         >
           中級
           <span class="description">
@@ -185,7 +287,7 @@
 
         <button
           class="difficulty-button advanced"
-          onclick="startQuiz('上級')"
+          onclick="notReady()"
         >
           上級
           <span class="description">
@@ -196,28 +298,101 @@
       </div>
 
       <div class="footer">
-        全3レベル・各100問予定
+        初級10問・中級100問・上級100問予定
       </div>
 
     </div>
 
 
+    <!-- ==================== -->
     <!-- クイズ画面 -->
+    <!-- ==================== -->
+
     <div id="quiz-screen">
 
-      <div class="quiz-title" id="quiz-level">
-        初級
+      <div class="quiz-header">
+
+        <div class="quiz-level">
+          初級クイズ
+        </div>
+
+        <div
+          class="question-number"
+          id="question-number"
+        >
+          第1問 / 10問
+        </div>
+
       </div>
 
-      <div class="question-box">
-        ここに問題が表示されます
+      <div
+        class="question-box"
+        id="question"
+      >
+      </div>
+
+      <div
+        class="answers"
+        id="answers"
+      >
+      </div>
+
+      <div
+        class="explanation"
+        id="explanation"
+      >
       </div>
 
       <button
-        class="back-button"
+        class="next-button"
+        id="next-button"
+        onclick="nextQuestion()"
+      >
+        次の問題
+      </button>
+
+    </div>
+
+
+    <!-- ==================== -->
+    <!-- 結果画面 -->
+    <!-- ==================== -->
+
+    <div id="result-screen">
+
+      <div class="result-title">
+        クイズ終了！
+      </div>
+
+      <div class="score-box">
+
+        <div
+          class="score"
+          id="score"
+        >
+          0 / 10
+        </div>
+
+        <div
+          class="score-message"
+          id="score-message"
+        >
+        </div>
+
+      </div>
+
+      <button
+        class="result-button retry"
+        onclick="startQuiz('初級')"
+      >
+        もう一度挑戦
+      </button>
+
+      <button
+        class="result-button back"
         onclick="backToStart()"
       >
-        難易度選択に戻る
+        難易度選択へ
       </button>
 
     </div>
@@ -227,31 +402,146 @@
 
   <script>
 
-    // 現在選択されている難易度
-    let currentLevel = "";
+    /* ========================================
+       初級問題10問
+       ======================================== */
 
-    // 難易度を選択
-    function startQuiz(level) {
+    const beginnerQuestions = [
 
-      currentLevel = level;
+      {
+        question: "『機動戦士ガンダム』で主人公が搭乗するモビルスーツは？",
+        choices: [
+          "ガンダム",
+          "ザクII",
+          "ジム",
+          "ドム"
+        ],
+        answer: 0,
+        explanation: "主人公アムロ・レイが搭乗するRX-78-2 ガンダムです。"
+      },
 
-      document.getElementById("start-screen").style.display = "none";
-      document.getElementById("quiz-screen").style.display = "block";
+      {
+        question: "ガンダムの主人公の名前は？",
+        choices: [
+          "シャア・アズナブル",
+          "アムロ・レイ",
+          "カイ・シデン",
+          "ブライト・ノア"
+        ],
+        answer: 1,
+        explanation: "『機動戦士ガンダム』の主人公はアムロ・レイです。"
+      },
 
-      document.getElementById("quiz-level").textContent =
-        level + "クイズ";
-    }
+      {
+        question: "『機動戦士ガンダム』でガンダムが所属する勢力は？",
+        choices: [
+          "ジオン公国",
+          "ティターンズ",
+          "地球連邦軍",
+          "ネオ・ジオン"
+        ],
+        answer: 2,
+        explanation: "ガンダムは地球連邦軍の試作モビルスーツです。"
+      },
 
-    // 難易度選択画面に戻る
-    function backToStart() {
+      {
+        question: "シャア・アズナブルが主に搭乗することで知られるモビルスーツは？",
+        choices: [
+          "赤いザクII",
+          "ジム",
+          "ガンキャノン",
+          "ボール"
+        ],
+        answer: 0,
+        explanation: "シャアは赤いカラーリングのザクIIに搭乗したことで有名です。"
+      },
 
-      document.getElementById("quiz-screen").style.display = "none";
-      document.getElementById("start-screen").style.display = "block";
+      {
+        question: "ガンダムの形式番号は？",
+        choices: [
+          "MS-06S",
+          "RX-78-2",
+          "RGM-79",
+          "MS-09"
+        ],
+        answer: 1,
+        explanation: "初代ガンダムの形式番号はRX-78-2です。"
+      },
 
-      currentLevel = "";
-    }
+      {
+        question: "ガンダムの母艦として登場する宇宙戦艦は？",
+        choices: [
+          "アーガマ",
+          "ネェル・アーガマ",
+          "ホワイトベース",
+          "ラー・カイラム"
+        ],
+        answer: 2,
+        explanation: "『機動戦士ガンダム』ではホワイトベースがガンダムの母艦です。"
+      },
 
-  </script>
+      {
+        question: "ジオン公国の代表的な量産型モビルスーツは？",
+        choices: [
+          "ザクII",
+          "ジムII",
+          "ガンキャノン",
+          "ネモ"
+        ],
+        answer: 0,
+        explanation: "ザクIIはジオン公国軍を代表する量産型モビルスーツです。"
+      },
 
-</body>
-</html>
+      {
+        question: "ガンダムシリーズで、人類が宇宙に進出した巨大な宇宙都市を何と呼ぶ？",
+        choices: [
+          "コロニー",
+          "セクター",
+          "ブロック",
+          "ハンガー"
+        ],
+        answer: 0,
+        explanation: "宇宙に建設された居住施設はスペースコロニーと呼ばれます。"
+      },
+
+      {
+        question: "『機動戦士ガンダム』でシャアが所属していた勢力は？",
+        choices: [
+          "地球連邦軍",
+          "ジオン公国",
+          "エゥーゴ",
+          "ロンド・ベル"
+        ],
+        answer: 1,
+        explanation: "一年戦争ではシャアはジオン公国軍の軍人として登場します。"
+      },
+
+      {
+        question: "『機動戦士ガンダム』がテレビ放送されたのは何年？",
+        choices: [
+          "1975年",
+          "1979年",
+          "1985年",
+          "1989年"
+        ],
+        answer: 1,
+        explanation: "『機動戦士ガンダム』は1979年にテレビ放送が開始されました。"
+      }
+
+    ];
+
+
+    /* ========================================
+       クイズ用変数
+       ======================================== */
+
+    let currentQuestion = 0;
+    let score = 0;
+    let shuffledQuestions = [];
+
+
+    /* ========================================
+       クイズ開始
+       ======================================== */
+
+    function
