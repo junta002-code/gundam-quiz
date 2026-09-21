@@ -544,4 +544,142 @@
        クイズ開始
        ======================================== */
 
-    function
+    function startQuiz(level) {
+  if (level !== '初級') {
+    notReady();
+    return;
+  }
+
+  currentQuestion = 0;
+  score = 0;
+
+  shuffledQuestions = [...beginnerQuestions]
+    .sort(() => Math.random() - 0.5);
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = shuffledQuestions[currentQuestion];
+
+  document.getElementById('question-number').textContent =
+    `第${currentQuestion + 1}問 / ${shuffledQuestions.length}問`;
+
+  document.getElementById('question').textContent = q.question;
+
+  const answers = document.getElementById('answers');
+  answers.innerHTML = '';
+
+  const explanation = document.getElementById('explanation');
+  explanation.style.display = 'none';
+  explanation.textContent = '';
+
+  const nextButton = document.getElementById('next-button');
+  nextButton.style.display = 'none';
+
+  q.choices.forEach((choice, index) => {
+    const button = document.createElement('button');
+
+    button.className = 'answer-button';
+    button.textContent = choice;
+
+    button.addEventListener('click', () => {
+      selectAnswer(index);
+    });
+
+    answers.appendChild(button);
+  });
+}
+
+function selectAnswer(selectedIndex) {
+  const q = shuffledQuestions[currentQuestion];
+
+  const buttons =
+    document.querySelectorAll('#answers .answer-button');
+
+  buttons.forEach((button, index) => {
+    button.disabled = true;
+
+    if (index === q.answer) {
+      button.classList.add('correct');
+    }
+
+    if (
+      index === selectedIndex &&
+      selectedIndex !== q.answer
+    ) {
+      button.classList.add('incorrect');
+    }
+  });
+
+  if (selectedIndex === q.answer) {
+    score++;
+  }
+
+  const explanation =
+    document.getElementById('explanation');
+
+  explanation.textContent = q.explanation;
+  explanation.style.display = 'block';
+
+  const nextButton =
+    document.getElementById('next-button');
+
+  if (currentQuestion === shuffledQuestions.length - 1) {
+    nextButton.textContent = '結果を見る';
+  } else {
+    nextButton.textContent = '次の問題';
+  }
+
+  nextButton.style.display = 'block';
+}
+
+function nextQuestion() {
+  currentQuestion++;
+
+  if (currentQuestion >= shuffledQuestions.length) {
+    showResult();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+
+  document.getElementById('score').textContent =
+    `${score} / ${shuffledQuestions.length}`;
+
+  const message =
+    document.getElementById('score-message');
+
+  if (score === shuffledQuestions.length) {
+    message.textContent = '全問正解！';
+  } else if (score >= 8) {
+    message.textContent = 'すごい！';
+  } else if (score >= 5) {
+    message.textContent = 'よくできました！';
+  } else {
+    message.textContent = 'もう一度挑戦してみよう！';
+  }
+}
+
+function backToStart() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'block';
+}
+
+function notReady() {
+  alert('中級・上級は準備中です。');
+}
+
+</script>
+
+</body>
+</html>
